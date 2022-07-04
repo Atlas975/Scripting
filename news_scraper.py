@@ -2,13 +2,9 @@ from itertools import zip_longest
 from selenium_config import ScrapeTool
 from colorama import Fore,Style
 
-import sys
-from IPython.core import ultratb
-sys.excepthook = ultratb.FormattedTB(mode='Context', color_scheme='Linux', call_pdb=None)
-
 class BBCscraper(ScrapeTool):
     def __init__(self,browser="chrome",search="https://www.bbc.com//news"):
-        ScrapeTool.__init__(self,browser,search)
+        ScrapeTool.__init__(self,browser,search,)
         self.focus='//div[@class="gs-c-promo-body gel-1/2@xs gel-1/1@m gs-u-mt@m"]'
         self.titleLoc='./div/a/h3'
         self.subtitleLoc='./div/p'
@@ -21,7 +17,6 @@ class BBCscraper(ScrapeTool):
         return titles,subtitles,urls
 
     def print_summary(self,priority=False):
-
         titles,subtitles,hrefs=self.get_summary()
         if priority:
             for title,subtitle,href in list(zip_longest(titles,subtitles,hrefs,fillvalue=""))[::-1]:
@@ -35,17 +30,6 @@ class BBCscraper(ScrapeTool):
         return "BBCbot"
 
 if __name__=="__main__":
-    # my_parser = argparse.ArgumentParser(description="Scrapes BBC news for articles", fromfile_prefix_chars="@")
-    # my_parser.add_argument("-b", "--buisness", help="scrapes articles in buisness category", action="store_true")
-    # my_parser.add_argument("-s", "--science", help="scrapes articles in science category", action="store_true")
-    # my_parser.add_argument("-t", "--technology", help="scrapes articles in technology category", action="store_true")
-    # my_parser.add_argument("-p", "--politics", help="scrapes articles in politics category", action="store_true")
-    # my_parser.add_argument("-e", "--entertainment", help="scrapes articles in entertainment category", action="store_true")
-
-
-    # check parser arguments for correct input
-
-
     bbcbot=BBCscraper("chrome","https://www.bbc.com/news/")
     print(f"\n{Fore.YELLOW}BBC Articles\n")
     bbcbot.print_summary()

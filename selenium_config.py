@@ -6,9 +6,8 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.common.exceptions import NoSuchElementException
 
-
 class ScrapeTool():
-    def __init__(self, browser = "chrome", url = "https://www.google.com"):
+    def __init__(self, browser = "chrome", url = "https://www.google.com", headless=True):
         self.path = "/home/adilw/Dropbox/Adil_Code/.web_drivers/" # path to web driver file, webdriver name appended
         self.url = url
         self.driver=None
@@ -16,7 +15,7 @@ class ScrapeTool():
             case "chrome":
                 self.path += "chromedriver"
                 op=ChromeOptions()
-                op.headless=True
+                op.headless=headless
                 try:
                     self.driver = webdriver.Chrome(service = Service(executable_path = self.path),options=op)
                 except Exception:
@@ -24,7 +23,7 @@ class ScrapeTool():
             case "edge":
                 self.path += "msedgedriver"
                 op=EdgeOptions()
-                op.headless=True
+                op.headless=headless
                 try:
                     self.driver = webdriver.Edge(service = Service(executable_path = self.path),options=op)
                 except Exception:
@@ -32,13 +31,12 @@ class ScrapeTool():
             case "firefox":
                 self.path += "geckodriver"
                 op = FirefoxOptions()
-                op.headless=True
+                op.headless=headless
                 try:
                     self.driver = webdriver.Firefox(service=Service(executable_path = self.path),options=op)
                 except Exception:
                     print("Firefox driver or browser not found")
         self.driver.get(self.url)
-
 
     def search(self):
         try:
@@ -73,9 +71,23 @@ class ScrapeTool():
         return content
 
 
-        # return [item.find_element(by=by, value=f'./{arg}').text for item in focus for arg in args]
+    def click(self,by,element,type='class'):
+        xml_path= self.xml_format(by,element,type)
+        self.driver.find_element(by='xpath',value=xml_path).click()
+
+    def xml_format(self,by,element,type='class'):
+        return f'//{by}[@{type}="{element}"]'
+
+    def enter_text(self,**kwargs):
+        for credential,element in kwargs.items():
+            self.driver.find_element(by='xpath',value=element).send_keys(credential)
+
+    def wait(self,duration=10):
+        self.driver.implicitly_wait(duration)
 
     def kill_bot(self,display=False):
         self.driver.quit()
         if display:
             print(f"{self} killed")
+
+
