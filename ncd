@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 
+import os
+import argparse as ap
 import subprocess as sp
 import platform as pf
-import sys
-from os.path import exists
 from getpass import getuser
-from typing import Optional
 
 EDITOR = "code -r"
 OS_VER = f"{pf.system()} {pf.release()}"
@@ -18,20 +17,7 @@ PUR = "\033[95m"
 YE = "\033[93m"
 CL = "\033[0m"
 
-
-def base_path(first_arg) -> Optional[str]:
-    match first_arg:
-        case "-e":
-            return "/home/adilw/Dropbox/Adil_Code/"
-        case "-o":
-            return "/home/adilw/Dropbox/Adil_Notes/"
-        case "-t":
-            return "/home/adilw/Dropbox/Adil_Code/Temp_Code/"
-        case _:
-            return None
-
-
-def create_file(path: str, fpath: str, fname: str, fexten: str) -> None:
+def create_file(fpath: str, fname: str, fexten: str) -> None:
     create = f"touch {fpath}"
     access = f"{EDITOR} {fpath}"
     ftype = None
@@ -82,7 +68,7 @@ def create_file(path: str, fpath: str, fname: str, fexten: str) -> None:
         return
 
     condition = "created"
-    if exists(fpath):
+    if os.path.exists(fpath):
         condition = f"{PUR}accessed{CL}"
         sp.run(f"{access}", shell=True)
     else:
@@ -92,23 +78,35 @@ def create_file(path: str, fpath: str, fname: str, fexten: str) -> None:
         f"{GR}{ftype}: {BL}{fname}{CL} {condition} by {BL}{OS_USR}{CL} on {YE}{OS_VER}{CL} at {GR}{fpath}{CL}"
     )
 
-def main(argv) -> None:
-    if not argv:
-        raise ValueError("Usage: ncd ... FILE ...")
-    path = "./"
-    if bpath := base_path(argv[0]):
-        path = bpath
-        argv = argv[1:]
+def flag_parse(args: ap.Namespace) -> str:
+    if args.e:
+        return "/home/adilw/Dropbox/Adil_Code"
+    if args.o:
+        return "/home/adilw/Dropbox/Adil_Notes"
+    if args.t:
+        return "/home/adilw/Dropbox/Adil_Code/Temp_Code"
+    return os.getcwd()
 
+
+def main(args: ap.Namespace) -> None:
+    if not args.FILES:
+        raise ValueError(args.usage)
+
+    basepath = flag_parse(args)
     sp.run(["clear"])
-    for arg in argv:
+    for arg in args.FILES:
         try:
-            fpath = path + arg
+            fpath = f'{basepath}/{arg}'
             fname, fexten = fpath[fpath.rfind("/") + 1 :].split(".", 1)
-            create_file(path, fpath, fname, fexten)
+            create_file(fpath, fname, fexten)
         except ValueError:
             print(f"{RD}{arg} is an invalid filename, skipping...{CL}")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    parser = ap.ArgumentParser(prog="ncd", usage="ncd [-e | -o | -t] ... FILES ...")
+    parser.add_argument("-e", action="store_true", help="create file in code directory")
+    parser.add_argument("-o", action="store_true", help="create file in notes directory")
+    parser.add_argument("-t", action="store_true", help="create file in temp directory")
+    parser.add_argument("FILES", nargs="+", help="file to create")
+    main(parser.parse_args())

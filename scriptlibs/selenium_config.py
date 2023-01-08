@@ -75,8 +75,8 @@ class ScrapeTool:  # use headless=False to show browser
         self.driver.find_element(by="xpath", value=xml_path).click()
 
     def enter_text(self, **kwargs):
-        for credential, element in kwargs.items():
-            self.driver.find_element(by="xpath", value=element).send_keys(credential)
+        for text, element in kwargs.items():
+            self.driver.find_element(by="xpath", value=element).send_keys(text)
 
     def wait(self, duration=1):
         self.driver.implicitly_wait(duration)
