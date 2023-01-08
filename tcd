@@ -1,0 +1,4 @@
+#!/bin/bash
+ncd /home/adilw/Dropbox/Adil_Code/Temp_Code/temp."$*"
+cd /home/adilw/Dropbox/Adil_Code/Temp_Code || exit
+

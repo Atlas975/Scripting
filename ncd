@@ -1,0 +1,112 @@
+#!/usr/bin/python3
+
+import subprocess as sp
+import platform as pf
+import sys
+from os.path import exists
+from getpass import getuser
+from typing import Optional
+
+EDITOR = "code -r"
+OS_VER = f"{pf.system()} {pf.release()}"
+OS_USR = getuser()
+
+RD = "\033[91m"
+GR = "\033[92m"
+BL = "\033[94m"
+PUR = "\033[95m"
+YE = "\033[93m"
+CL = "\033[0m"
+
+
+def base_path(first_arg) -> Optional[str]:
+    match first_arg:
+        case "-e":
+            return "/home/adilw/Dropbox/Adil_Code/"
+        case "-o":
+            return "/home/adilw/Dropbox/Adil_Notes/"
+        case _:
+            return None
+
+
+def create_file(path: str, fpath: str, fname: str, fexten: str) -> None:
+    create = f"touch {fpath}"
+    access = f"{EDITOR} {fpath}"
+    ftype = None
+
+    match fexten:
+        case "py":
+            ftype = "Python file"
+        case "md":
+            ftype = "Markdown file"
+        case "sh":
+            ftype = "Bash file"
+        case "rs":
+            ftype = "Cargo package"
+            fpath = fpath[:-3]
+            create = f"cargo new -q {fpath}"
+            access = f"{EDITOR} {fpath}/src/main.rs"
+        case "java":
+            ftype = "Java file"
+        case "js":
+            ftype = "JavaScript file"
+        case "ts":
+            ftype = "TypeScript file"
+        case "c":
+            ftype = "C file"
+        case "cpp":
+            ftype = "C++ file"
+        case "html":
+            ftype = "HTML file"
+        case "css":
+            ftype = "CSS file"
+        case "rb":
+            ftype = "Ruby file"
+        case "go":
+            ftype = "Go file"
+        case "hs":
+            ftype = "Haskell file"
+        case "cs":
+            ftype = "C# file"
+        case "R":
+            ftype = "R file"
+        case "erl":
+            ftype = "Erlang file"
+        case "php":
+            ftype = "PHP file"
+
+    if ftype is None:
+        print(f"{RD}{fexten}{CL} is an invalid extension, skipping...")
+        return
+
+    condition = "created"
+    if exists(fpath):
+        condition = f"{PUR}accessed{CL}"
+        sp.run(f"{access}", shell=True)
+    else:
+        sp.run(f"{create} && {access}", shell=True)
+
+    print(
+        f"{GR}{ftype}: {BL}{fname}{CL} {condition} by {BL}{OS_USR}{CL} on {YE}{OS_VER}{CL} at {GR}{fpath}{CL}"
+    )
+
+def main(argv) -> None:
+    if not argv:
+        raise ValueError("Usage: ncd ... FILE ...")
+    path = "./"
+    if bpath := base_path(argv[0]):
+        path = bpath
+        argv = argv[1:]
+
+    sp.run(["clear"])
+    for arg in argv:
+        try:
+            fpath = path + arg
+            fname, fexten = fpath[fpath.rfind("/") + 1 :].split(".", 1)
+            create_file(path, fpath, fname, fexten)
+        except ValueError:
+            print(f"{RD}{arg} is an invalid filename, skipping...{CL}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

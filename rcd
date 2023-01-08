@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+
+import subprocess as sp
+from sys import argv
+
+
+def java_cmd(fpath: str, fname: str, args: str) -> str:
+    if len(argv) > 2 and argv[2] == "-DIR":
+        return f"cd src && javac -d ../target *.java && cd .. && java -cp ./target {fname} {args}"
+    return f"javac {fpath} && java {fname} {args}"
+
+
+def get_cmd(fpath: str, fname: str, fexten: str, args: str) -> str:
+    match fexten:
+        case "py":
+            return f"python3 {fpath} {args}"
+        case "sh":
+            return f"{fpath} {args}"
+        case "rb":
+            return f"ruby {fpath} {args}"
+        case "rs":
+            return f"cargo run --quiet {args}"
+        case "java":
+            return java_cmd(fpath, fname, args)
+        case "js":
+            return f"node {fpath} {args}"
+        case "ts":
+            return f"ts-node {fpath} {args}"
+        case "c":
+            return f"gcc {fpath} -o {fname} && ./{fname} {args}"
+        case "cpp":
+            return f"g++ {fpath} -o {fname} && ./{fname} {args}"
+        case "go":
+            return f"go run {fpath} {args}"
+        case "hs":
+            return f"runhaskell {fpath} {args}"
+        case "cs":
+            return f"mcs {fpath} && mono {fname}.exe {args}"
+        case "R":
+            return f"Rscript {fpath} {args}"
+        case "erl":
+            return f"erlc {fpath} && erl -noshell -s {fname}:main(). -s init stop"
+        case "php":
+            return f"php {fpath} {args}"
+        case "md":
+            return f"pandoc {fpath} -o {fname}.pdf"
+        case _:
+            raise ValueError(f"Unknown extension: {fexten}")
+
+
+def main() -> None:
+    if len(argv) < 2:
+        raise ValueError("No filename provided")
+    try:
+        fpath = argv[1]
+        fname, fexten = fpath[fpath.rfind("/") + 1 :].split(".", 1)
+        args = " ".join(argv[2:])
+    except ValueError as e:
+        raise ValueError("Invalid filename provided") from e
+
+    cmd = get_cmd(fpath, fname, fexten, args)
+    sp.call(["clear"])
+    sp.run(cmd, shell=True)
+
+
+if __name__ == "__main__":
+    main()
