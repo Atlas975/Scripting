@@ -25,6 +25,8 @@ def base_path(first_arg) -> Optional[str]:
             return "/home/adilw/Dropbox/Adil_Code/"
         case "-o":
             return "/home/adilw/Dropbox/Adil_Notes/"
+        case "-t":
+            return "/home/adilw/Dropbox/Adil_Code/Temp_Code/"
         case _:
             return None
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from itertools import zip_longest
-from selenium_config import ScrapeTool
+from scriptlibs.selenium_config import ScrapeTool
 from colorama import Fore, Style
 
 
