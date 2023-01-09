@@ -18,11 +18,24 @@ git config --global alias.lo log
 
 
 # macro aliases
+
+git_msg_push() {
+    git add .
+    git commit -m "$*"
+    git push
+}
+
+git_auto_push() {
+    git add .
+    git commit -m "Auto commit $(TZ='UTC' date +'%T-%D (UTC)')"
+    git push
+}
+
 alias g-cam="git commit -am"
 alias g-chb="git checkout -b"
 alias g-org="git remote set-url origin"
-alias g-mps="git add . && git commit -m ""$*"" && git push"
-# alias g-aps="git add . && git commit -m ""$(TZ='UTC' date +'%T-%D (UTC)')"" && git push"
+alias g-mps=git_msg_push
+alias g-aps=git_auto_push
 
 
 
