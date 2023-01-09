@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export gbase="git@github.com:Atlas975"
-
 git config --global alias.ad add
 git config --global alias.st status
 git config --global alias.ch checkout
@@ -15,10 +13,7 @@ git config --global alias.in init
 git config --global alias.rm remove
 git config --global alias.lo log
 
-
-
 # macro aliases
-
 git_msg_push() {
     git add .
     git commit -m "$*"
@@ -31,9 +26,14 @@ git_auto_push() {
     git push
 }
 
+remote_personal() {
+    git remote set-url origin git@github.com:Atlas975/"$*".git
+}
+
 alias g-cam="git commit -am"
 alias g-chb="git checkout -b"
 alias g-org="git remote set-url origin"
+alias g-atls=remote_personal
 alias g-mps=git_msg_push
 alias g-aps=git_auto_push
 
