@@ -38,5 +38,3 @@ alias g-mps=git_msg_push
 alias g-aps=git_auto_push
 
 
-
-
