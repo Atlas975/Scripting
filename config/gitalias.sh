@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export gbase="git@github.com:Atlas975"
-# general aliases
+
 git config --global alias.ad add
 git config --global alias.st status
 git config --global alias.ch checkout
@@ -15,10 +15,15 @@ git config --global alias.in init
 git config --global alias.rm remove
 git config --global alias.lo log
 
+
+
 # macro aliases
-git config --global alias.cam "commit -am"
-git config --global alias.chb "checkout -b"
-git config --global alias.org "remote set-url origin"
-# git config --global alias.ordrm
+alias g-cam="git commit -am"
+alias g-chb="git checkout -b"
+alias g-org="git remote set-url origin"
+alias g-mps="git add . && git commit -m ""$*"" && git push"
+# alias g-aps="git add . && git commit -m ""$(TZ='UTC' date +'%T-%D (UTC)')"" && git push"
+
+
 
 
