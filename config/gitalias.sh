@@ -2,6 +2,7 @@
 
 git config --global alias.ad add
 git config --global alias.st status
+git config --global alias.me merge
 git config --global alias.ch checkout
 git config --global alias.ro remote
 git config --global alias.co commit
