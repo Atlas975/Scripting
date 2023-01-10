@@ -37,10 +37,7 @@ class ScrapeTool:  # use headless=False to show browser
         self.driver.get(self.url)
 
     def search(self):
-        try:
-            self.driver.get(self.url)
-        except Exception:
-            print("Invalid URL input")
+        self.driver.get(self.url)
 
     def url_append(self, argument):
         return f"{self.url}/{argument}"
