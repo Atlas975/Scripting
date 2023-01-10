@@ -12,7 +12,7 @@ class ScrapeTool:  # use headless=False to show browser
     ):
         self.path = "/home/adilw/Dropbox/Adil_Code/.web_drivers/"  # path to driver file, webdriver name appended
         self.url = start_url
-        match (browser.lower()):
+        match (browser):
             case "firefox":
                 self.path += "geckodriver"
                 op = FirefoxOptions()
@@ -37,37 +37,36 @@ class ScrapeTool:  # use headless=False to show browser
         self.driver.get(self.url)
 
     def search(self):
-        if self.driver:
-            try:
-                self.driver.get(self.url)
-            except Exception:
-                print("Invalid URL input")
+        try:
+            self.driver.get(self.url)
+        except Exception:
+            print("Invalid URL input")
 
-    def url_append(self, argument, replace_depth=0):
-        self.url = (
-            "{self.url}/{argument}"
-            if replace_depth == 0
-            else f"{self.url_remove(replace_depth)}/{argument}"
-        )
+    def url_append(self, argument):
+        return f"{self.url}/{argument}"
 
-    def url_remove(self, depth=1):
-        for _ in range(depth):
-            cutoff = self.url.rfind("/")
-            self.url = self.url[:cutoff]
+    def url_remove(self, replace_depth=1):
+        cutoff = self.url.rfind("/")
+        for _ in range(1, replace_depth):
+            if cutoff == -1:
+                raise ValueError("Removal depth exceeds URL length")
+            cutoff = self.url.rfind("/", 0, cutoff)
+        return self.url[:cutoff]
 
-    def element_extract(self, by="xpath", element="//div", type="text", *args):
+    def element_extract(self, by="xpath", element="//div", attribute="text", *args):
         focus = self.driver.find_elements(by=by, value=element)
         content = []
         for item in focus:
             for arg in args:
                 with contextlib.suppress(NoSuchElementException):
-                    match (type):
-                        case "text":
-                            content.append(f"{item.find_element(by=by,value=arg).text}")
-                        case "href":
-                            content.append(
-                                f"{item.find_element(by=by,value=arg).get_attribute('href')}"
-                            )
+                    content.append(
+                        item.find_element(by=by, value=arg).text
+                        if attribute == "text"
+                        else item.find_element(by=by, value=arg).get_attribute(
+                            attribute
+                        )
+                    )
+
         return content
 
     def click(self, by, element, type="class"):
