@@ -38,7 +38,6 @@ git_revert_commit() {
     git revert "$*"
 }
 
-
 alias g-cam="git commit -am"
 alias g-chb="git checkout -b"
 alias g-org="git remote set-url origin"

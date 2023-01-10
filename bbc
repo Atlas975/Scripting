@@ -2,8 +2,13 @@
 
 from itertools import zip_longest
 from scriptlibs.selenium_config import ScrapeTool
-from colorama import Fore, Style
 
+
+BLUE = "\033[94m"
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+CLEAR = "\033[0m"
 
 class BBCscraper(ScrapeTool):
     def __init__(self, browser="chrome", search="https://www.bbc.com//news"):
@@ -26,19 +31,11 @@ class BBCscraper(ScrapeTool):
     def print_summary(self, priority=False):
         titles, subtitles, hrefs = self.get_summary()
         if priority:
-            for title, subtitle, href in list(
-                zip_longest(titles, subtitles, hrefs, fillvalue="")
-            )[::-1]:
-                print(
-                    f"{Fore.RED}{title}\n{Fore.BLUE}{href}\n{Style.RESET_ALL}{subtitle}\n"
-                )
+            for title, subtitle, href in zip_longest(titles, subtitles, hrefs, fillvalue=""):
+                print(f"{RED}{title}\n{BLUE}{href}\n{CLEAR}{subtitle}\n")
         else:
-            for title, subtitle, href in list(
-                zip_longest(titles, subtitles, hrefs, fillvalue="")
-            )[::-1]:
-                print(
-                    f"{Fore.GREEN}{title}\n{Fore.BLUE}{href}\n{Style.RESET_ALL}{subtitle}\n"
-                )
+            for title, subtitle, href in zip_longest(titles, subtitles, hrefs, fillvalue=""):
+                print(f"{GREEN}{title}\n{BLUE}{href}\n{CLEAR}{subtitle}\n")
 
     def __str__(self):
         return "BBCbot"
@@ -46,7 +43,7 @@ class BBCscraper(ScrapeTool):
 
 if __name__ == "__main__":
     bbcbot = BBCscraper("firefox", "https://www.bbc.com/news/")
-    print(f"\n{Fore.YELLOW}BBC Articles\n")
+    print(f"\n{YELLOW}BBC Articles\n")
     bbcbot.print_summary()
     bbcbot.focus = '//div[@class="gs-c-promo-body gs-u-display-none gs-u-display-inline-block@m gs-u-mt@xs gs-u-mt0@m gel-1/3@m"]'
     bbcbot.print_summary(True)
