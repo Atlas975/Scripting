@@ -1,7 +1,0 @@
-#!/bin/bash
-echo -e "\e[0;31m";
-echo -e "Cleaning system...";
-sudo dnf autoremove -y;
-rm -rf ~/.local/share/Trash/*
-rm -rf ~/Downloads/*
-rm -rf ~/Pictures/*

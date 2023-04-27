@@ -1,5 +1,0 @@
-#!/usr/bin/python3
-from webbrowser import open_new_tab
-from sys import argv
-open_new_tab("https://www.youtube.com/results?search_query="+'+'.join(argv[1:]))
-

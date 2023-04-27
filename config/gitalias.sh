@@ -1,49 +1,38 @@
 #!/bin/bash
 
-git config --global alias.ad add
-git config --global alias.st status
-git config --global alias.me merge
-git config --global alias.ch checkout
-git config --global alias.ro remote
-git config --global alias.co commit
-git config --global alias.br branch
-git config --global alias.pl pull
-git config --global alias.ps push
-git config --global alias.cl clone
-git config --global alias.in init
-git config --global alias.rm remove
-git config --global alias.ss stash
-git config --global alias.lo log
 
-
-
-# macro aliases
 git_msg_push() {
     git add .
     git commit -m "$*"
-    git push
+    git push -u
 }
 
 git_auto_push() {
     git add .
-    git commit -m "Auto commit $(TZ='UTC' date +'%T-%D (UTC)')"
-    git push
+    git commit -m "Auto commit $(TZ='UTC' date +'%T %d/%m/%y (UTC)')"
+    git push -u
 }
 
 git_remote_personal() {
+    git init
+    git remote add origin git@github.com:Atlas975/"$*".git
     git remote set-url origin git@github.com:Atlas975/"$*".git
+    git pull git@github.com:Atlas975/"$*".git main
+    git add .; git commit -m "Initial commit"; git push -u origin main
 }
 
-git_revert_commit() {
-    git revert "$*"
+git_finalize_feature() {
+    git checkout main
+    git pull
+    git merge "$*" && git add . && git commit -m "Merged $*" && git push && git branch -d "$*"
 }
 
-alias g-cam="git commit -am"
-alias g-chb="git checkout -b"
-alias g-org="git remote set-url origin"
+git_ignore() {
+    touch .gitignore; echo -e "$*" >> .gitignore
+}
+
 alias g-atls=git_remote_personal
 alias g-mps=git_msg_push
 alias g-aps=git_auto_push
-alias g-rev=git_revert_commit
-
-
+alias g-fin=git_finalize_feature
+alias g-ig=git_ignore

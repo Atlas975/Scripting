@@ -12,10 +12,11 @@ OS_USR = getuser()
 
 RD = "\033[91m"
 GR = "\033[92m"
-BL = "\033[94m"
 PUR = "\033[95m"
+BL = "\033[94m"
 YE = "\033[93m"
 CL = "\033[0m"
+
 
 def create_file(fpath: str, fname: str, fexten: str) -> None:
     create = f"touch {fpath}"
@@ -48,6 +49,8 @@ def create_file(fpath: str, fname: str, fexten: str) -> None:
             ftype = "HTML file"
         case "css":
             ftype = "CSS file"
+        case "sql":
+            ftype = "SQL file"
         case "rb":
             ftype = "Ruby file"
         case "go":
@@ -62,6 +65,10 @@ def create_file(fpath: str, fname: str, fexten: str) -> None:
             ftype = "Erlang file"
         case "php":
             ftype = "PHP file"
+        case "tex":
+            ftype = "LaTeX file"
+        case "txt":
+            ftype = "Text file"
 
     if ftype is None:
         print(f"{RD}{fexten}{CL} is an invalid extension, skipping...")
@@ -80,13 +87,14 @@ def create_file(fpath: str, fname: str, fexten: str) -> None:
 
 def flag_parse(args: ap.Namespace) -> str:
     if args.e:
-        return "/home/adilw/Dropbox/Adil_Code"
+        return "$DEV"
     if args.o:
-        return "/home/adilw/Dropbox/Adil_Notes"
+        return "$NOTES"
     if args.t:
-        return "/home/adilw/Dropbox/Adil_Code/Temp_Code"
+        return "$DEV/Temp_Code"
+    if args.s:
+        return "$DEV/Temp_Code/SystemTests"
     return os.getcwd()
-
 
 def main(args: ap.Namespace) -> None:
     if not args.FILES:
@@ -108,5 +116,6 @@ if __name__ == "__main__":
     parser.add_argument("-e", action="store_true", help="create file in code directory")
     parser.add_argument("-o", action="store_true", help="create file in notes directory")
     parser.add_argument("-t", action="store_true", help="create file in temp directory")
+    parser.add_argument("-s", action="store_true", help="create file in system tests directory")
     parser.add_argument("FILES", nargs="+", help="file to create")
     main(parser.parse_args())
