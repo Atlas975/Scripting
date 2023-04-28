@@ -1,14 +1,25 @@
 #!/bin/bash
 
-add_boilerplate() {
+bl="\033[94m"
+pu="\033[95m"
+gr="\033[92m"
+ye="\033[93m"
+rd="\033[91m"
+with_boiler=0
+with_dir=0
+
+boilerplate_option() {
+	if [[ $with_boiler -ne 1 ]]; then
+		return
+	fi
 	local fullFileName="$1"
-    local dir="$(dirname "$fullFileName")"
-    local dirWithoutTrailingSlash="${dir%/}"
-    local fileName="$(basename "$fullFileName")"
-    local fileNameWithoutExt="${fileName%.*}"
-    local ext="${fileName##*.}"
-    local boil=""
-    local ind="    "
+	local dir="$(dirname "$fullFileName")"
+	local dirWithoutTrailingSlash="${dir%/}"
+	local fileName="$(basename "$fullFileName")"
+	local fileNameWithoutExt="${fileName%.*}"
+	local ext="${fileName##*.}"
+	local boil=""
+	local ind="    "
 	case $ext in
 	"py")
 		boil="\nif __name__ == \"__main__\":\n${ind}..."
@@ -70,7 +81,7 @@ add_boilerplate() {
 	"swift")
 		boil="print(\"Hello World!\")"
 		;;
-	"pl")
+	"pu")
 		boil="print \"Hello World!\""
 		;;
 	"lua")
@@ -92,26 +103,48 @@ add_boilerplate() {
 	printf '%b' "$boil" >>"$1"
 }
 
-new_code() {
-	local with_boiler=0
-	if [[ $1 == "-b" ]]; then
-		with_boiler=1
-		shift
+directory_option() {
+	if [[ -d "$1" ]]; then
+		return
 	fi
-	local file="$1"
-	if [ -e "$file" ]; then
-		printf "\033[95m(%s)\033[92m Opened ${file}\n" "$(uname -or)"
-
-	else
-		printf "\033[95m(%s)\033[93m Created ${file}\n" "$(uname -or)"
+	if [[ $with_dir -ne 1 ]]; then
+		printf "${rd}Error: Directory %s not found, use -d option to allow directory creation, exiting...\n" "$1"
+		exit 1
 	fi
-	touch "$file"
-	code -r "$file"
-	if [[ $with_boiler -eq 1 ]]; then
-		add_boilerplate "$file"
-	fi
+	mkdir -p "$1"
+	printf "${ye}Created directory %s\n" "$1"
 }
 
-new_code "$@"
+create_file() {
+	if [[ ! -f "$1" ]]; then
+		dir=$(dirname "$1")
+		file=$(basename "$1")
+		directory_option "$dir"
+		touch "$1"
+		printf "${ye}Created file %s\n" "$file"
+	fi
 
+	printf "${bl}%s ${pu}(%s)${gr} Opened %s\n" "$(whoami)" "$(uname -or)" "$1"
+	code -r "$1"
+	boilerplate_option "$1"
+}
 
+while getopts 'bd' opt; do
+	case "$opt" in
+	b)
+		with_boiler=1
+		;;
+	d)
+		with_dir=1
+		;;
+	\?)
+		printf "${rd}Usage: ncd [-b] [-d] file ...\n" >&2
+		exit 1
+		;;
+	esac
+done
+shift $((OPTIND - 1))
+
+for file in "$@"; do
+	create_file "$file"
+done
