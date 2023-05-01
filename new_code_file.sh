@@ -1,15 +1,19 @@
 #!/bin/bash
 
-bl="\033[94m"
-pu="\033[95m"
-gr="\033[92m"
-ye="\033[93m"
-rd="\033[91m"
-with_boiler=0
-with_dir=0
+EDITOR="code -r"
+WITH_BOILER=0
+DISABLE_OPEN=0
+DISABLE_DIR=0
+VERBOSE=0
+GREEN="\033[92m"
+YELLOW="\033[93m"
+RED="\033[91m"
+
+
+
 
 boilerplate_option() {
-	if [[ $with_boiler -ne 1 ]]; then
+	if [[ $WITH_BOILER -ne 1 ]]; then # if boilerplate is not enabled, return
 		return
 	fi
 	local fullFileName="$1"
@@ -20,6 +24,7 @@ boilerplate_option() {
 	local ext="${fileName##*.}"
 	local boil=""
 	local ind="    "
+	
 	case $ext in
 	"py")
 		boil="\nif __name__ == \"__main__\":\n${ind}..."
@@ -102,49 +107,70 @@ boilerplate_option() {
 	esac
 	printf '%b' "$boil" >>"$1"
 }
-
-directory_option() {
-	if [[ -d "$1" ]]; then
+open_option() {
+	if [[ $DISABLE_OPEN -eq 1 ]]; then # if opening is disabled, return
 		return
 	fi
-	if [[ $with_dir -ne 1 ]]; then
-		printf "${rd}Error: Directory %s not found, use -d option to allow directory creation, exiting...\n" "$1"
+	$EDITOR "$1"
+}
+
+directory_option() {
+	if [[ -d "$1" ]]; then # if directory exists, return
+		return
+	fi
+	if [[ $DISABLE_DIR -eq 1 ]]; then # if directory creation is disabled and directory doesn't exist, exit
+		printf "${RED}Error: Directory %s not found, -d prevents directory creation, exiting...\n" "$1"
 		exit 1
 	fi
 	mkdir -p "$1"
-	printf "${ye}Created directory %s\n" "$1"
+
+	if [[ $VERBOSE -eq 1 ]]; then
+		printf "${YELLOW}Created directory %s\n" "$1"
+	fi
 }
 
 create_file() {
-	if [[ ! -f "$1" ]]; then
+	if [[ ! -f "$1" ]]; then # if file doesn't exist, create it
 		dir=$(dirname "$1")
 		file=$(basename "$1")
 		directory_option "$dir"
 		touch "$1"
-		printf "${ye}Created file %s\n" "$file"
+
+		if [[ $VERBOSE -eq 1 ]]; then
+			printf "${YELLOW}Created file %s\n" "$file"
+		fi
 	fi
 
-	printf "${bl}%s ${pu}(%s)${gr} Opened %s\n" "$(whoami)" "$(uname -or)" "$1"
-	code -r "$1"
+	if [[ $VERBOSE -eq 1 ]]; then
+		printf "${GREEN}Opened %s\n" "$1"
+	fi
+	
 	boilerplate_option "$1"
+	open_option "$1"
 }
 
-while getopts 'bd' opt; do
+while getopts 'bdov' opt; do # parse options
 	case "$opt" in
 	b)
-		with_boiler=1
+		WITH_BOILER=1
 		;;
 	d)
-		with_dir=1
+		DISABLE_DIR=1
+		;;
+	o)
+		DISABLE_OPEN=1
+		;;
+	v)
+		VERBOSE=1
 		;;
 	\?)
-		printf "${rd}Usage: ncd [-b] [-d] file ...\n" >&2
+		printf "${RED}Usage: ncd [-b] [-d] file ...\n" >&2
 		exit 1
 		;;
 	esac
 done
-shift $((OPTIND - 1))
+shift $((OPTIND - 1)) # shift options so that only file arguments remain
 
-for file in "$@"; do
+for file in "$@"; do # loop through file arguments
 	create_file "$file"
 done
